@@ -1,0 +1,132 @@
+<%- include('partials/header.ejs') %>
+        <style>
+            div {
+                padding: 25px;
+            }
+            
+            a {
+              color: black;
+              text-decoration: none;
+            }
+
+            a:visited {
+              color: black;
+              text-decoration: none;
+            }
+            
+            a:hover {
+              color: brown;
+              text-decoration: none;
+            }
+            
+            a:active {
+              color: black;
+              text-decoration: none;
+            }
+            
+            .table-borderless td,
+            .table-borderless th {
+                border: 0;
+                
+            }
+        </style>
+        <main>
+            <div class="container">
+                <div class="row-lg justify-content-lg-center">
+                    <div class="col col-lg-10">
+                        <h3> Shopping Cart </h3>
+                    </div>
+                </div>
+                <div class="row-lg justify-content-lg-center">
+                    <div id="shoppingCart" class="col-lg-10">
+                    </div>
+                </div>
+                <div class="row">
+                    <div id ="customerInformation" class="col-sm-3" hidden>
+                        <form id="cartCusInformationForm" method="post" action="/submitorder" class="form-horizontal">
+                            <fieldset>
+                                <label for="name_first">First Name: </label>
+                                <input type="text" name="name_first" id="nameFirst" class="form-control"/>
+                                <label for="name_last">Last Name: </label>
+                                <input type="text" name="name_last" id="nameLast" class="form-control"/>
+                                <label for="email">Email: </label>
+                                <input type="text" name="email" id="email" class="form-control"/>
+                                <label for="location">Pick up location: </label>
+                                <select id="location" name="location" class="form-control"></select>
+                                <input type="text" name="subtotal" id="formSubtotal" hidden/>
+                                <input type="text" name="tax" id="formTax" hidden/>
+                                <input type="text" name="total" id="formTotal" hidden/>
+                                <br/>
+                                <span id="cartInfromationError" class="text-danger"></span>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="col-sm-3">
+                    </div>
+                    <div id ="priceSummary" class="col-sm-2" hidden>
+                        <br/>
+                        <h5>Subtotal: $<span id='subtotalPrice'>0.00</span></h5>
+                        <h5>Tax: $<span id='taxPrice'>0.00</span></h5>
+                        <hr class="cart"/>
+                        <h4>Total: $<span id='totalPrice'>0.00</span></h4>
+                        <br/>
+                        <!--<a href='' id='cartPlaceOrder' class='btn btn-warning'>Place Order</a>-->
+                        <input id='cartPlaceOrder' class='btn btn-warning' type="button" value="Place Order">
+                    </div>
+                </div>
+            </div>
+        </main>
+        <script>
+            $(document).ready(function() {
+                 $("#location").on("change", function(){
+                     cartCalculatePrice();
+                });//location
+                
+                $("#shoppingCart").on("click", ".deleteLine", function(){
+                    let orderLine = $(this).attr("data-orderline");
+                     $.ajax({
+                        method: "get",
+                        url: "/api/cart/deleteitem",
+                        data: {
+                            "orderline": orderLine
+                        },
+                        success: function(data, status) {
+                        }
+                    }); //ajax
+                });
+                
+                 $("#cartPlaceOrder").on("click", function() {
+                     $("#cartInfromationError").html("");
+                      if(isCartFormValid()){
+                          $("#cartCusInformationForm").submit();
+                    } else {
+                        $("#cartInfromationError").html("Please Enter All Informtaion");
+                    }
+                 })
+                
+                function isCartFormValid(){
+                    var isValid = true;
+                    var emailFormat = /\S+@\S+/;
+                    
+                    if($("#nameFirst").val().length == 0){
+                        isValid = false;
+                    }
+                    if($("#nameLast").val().length == 0){
+                        isValid = false;
+                    }
+                    if(!emailFormat.test(String($("#email").val()).toLowerCase())){
+                        //$("#email").val().length == 0 && 
+                        isValid = false;
+                    }
+                     if($("#location option:selected").val() == 0){
+                        isValid = false;
+                    }
+                    return isValid;
+                }
+                
+                cartGetCart();
+                cartGetLocations();
+            }); //ready
+        </script>
+        
+<%- include('partials/footer.ejs') %>
