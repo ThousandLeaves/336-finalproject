@@ -342,11 +342,11 @@ app.get("/api/cart/locations", async function(req, res){
 app.post("/submitorder", async function (req, res) {
     if(req.session.orderid) {
         let orderId = req.session.orderid;
-        let orderLocation =  req.query.location;
-        let orderTotal = req.query.total;
+        let orderLocation =  req.body.location;
+        let orderTotal = req.body.total;
         let sql = "UPDATE orders SET status = ?, location = ?, name_first = ?, name_last = ?, email = ?, subtotal = ?, tax = ?, total = ?, order_date = ? WHERE order_id = ?";
-        let sqlParams = [2, req.query.location, req.query.name_first, req.query.name_last,
-        req.query.email, req.query.subtotal, req.query.tax, req.query.total, 
+        let sqlParams = [2, req.body.location, req.body.name_first, req.body.name_last,
+        req.body.email, req.body.subtotal, req.body.tax, req.body.total, 
         dateFormat(Date.now(), "yyyy-mm-dd"), req.session.orderid];
         return new Promise (function (resolve, reject) {
             pool.query(sql, sqlParams, function (err, rows, fields) {
